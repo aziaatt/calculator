@@ -1,45 +1,90 @@
-const add = function(a, b){
-    let solution = 0;
-    solution = a + b;
-    return solution;
+let firstOperand = ''
+let secondOperand = ''
+let currentOperation = null
+let shouldResetScreen = false
+
+const numberButtons = document.querySelectorAll('[data-number]');
+const operationButtons = document.querySelectorAll('[data-operation]');
+const equalsButton = document.querySelector('[data-equals]');
+const deleteButton = document.querySelector('[data-delete]');
+const allClearButton = document.querySelector('[data-all-clear]');
+const previousOperandTextElement = document.querySelector('[data-previous-operand]');
+const currentOperandTextElement = document.querySelector('[data-current-operand]');
+
+numberButtons.forEach((button) => button.addEventListener('click', () => 
+appendNumber(button.textContent)))
+
+operationButtons.forEach((button) =>
+  button.addEventListener('click', () => setOperation(button.textContent))
+)
+
+function appendNumber(number){
+    if (currentOperandTextElement.textContent === '0' || shouldResetScreen)
+    resetScreen()
+    currentOperandTextElement.textContent += number
 }
 
-const subtract = function(a, b){
-    let solution = 0;
-    solution = a - b;
-    return solution;
-}
+function resetScreen() {
+    currentOperandTextElement.textContent = ''
+    shouldResetScreen = false
+  }
 
-const multiply = function(a, b){
-    let solution = 0;
-    solution = a * b;
-    return solution;
-}
+function setOperation(operator) {
+    if (currentOperation !== null) evaluate()
+    firstOperand = currentOperandTextElement.textContent
+    currentOperation = operator
+    previousOperandTextElement.textContent = `${firstOperand} ${currentOperation}`
+    shouldResetScreen = true
+  }
 
-const divide = function(a, b){
-    let solution = 0;
-    solution = a / b;
-    return solution;
-}
-
-const operate = function(){
-    let operator; /*prompt("What operator would you like to use?")*/
-    let a; /*parseInt(prompt("What is the first number?"))*/
-    let b; /*parseInt(prompt("What is the second number?"))*/
-    let solution = 0
-    if(operator == "add"){
-        let solution = add(a, b);
-        return solution;
-    } else if(operator == "subtract"){
-        let solution = subtract(a, b);
-        return solution;
-    } else if(operator == "multiply"){
-        let solution = multiply(a, b);
-        return solution;
-    } else if(operator == "divide"){
-        let solution = divide(a, b);
-        return solution;
+function evaluate() {
+    if (currentOperation === null || shouldResetScreen) return
+    if (currentOperation === '÷' && currentOperandTextElement.textContent === '0') {
+      alert("You can't divide by 0!")
+      return
     }
-    return solution;
-}
-// console.log(operate());
+    secondOperand = currentOperandTextElement.textContent
+    currentOperandTextElement.textContent = roundResult(
+      operate(currentOperation, firstOperand, secondOperand)
+    )
+    lastOperationScreen.textContent = `${firstOperand} ${currentOperation} ${secondOperand} =`
+    currentOperation = null
+  }
+
+  function roundResult(number) {
+    return Math.round(number * 1000) / 1000
+  }
+
+  function add(a, b) {
+    return a + b
+  }
+  
+  function substract(a, b) {
+    return a - b
+  }
+  
+  function multiply(a, b) {
+    return a * b
+  }
+  
+  function divide(a, b) {
+    return a / b
+  }
+  
+  function operate(operator, a, b) {
+    a = Number(a)
+    b = Number(b)
+    switch (operator) {
+      case '+':
+        return add(a, b)
+      case '−':
+        return substract(a, b)
+      case '×':
+        return multiply(a, b)
+      case '÷':
+        if (b === 0) return null
+        else return divide(a, b)
+      default:
+        return null
+    }
+  }
